@@ -33,7 +33,7 @@ Seguro.prototype.cotizarSeguro = function(){
     resultado -= ((diferencia * 3) * resultado) / 100;
 
     // si el seguro es basico se multiplica por 30%
-    // si es completo se multiplica por 505
+    // si es completo se multiplica por 50%
 
     if(this.tipo === 'basico'){
         resultado *= 1.3;
@@ -81,6 +81,44 @@ UI.prototype.mostrarMensaje = (mensaje, tipo) => {
     }, 3000);
 }
 
+UI.prototype.mostrarResultado = (total, seguro) => {
+    const {marca, year, tipo} = seguro;
+    let textoTipo;
+    switch (marca) {
+        case '1':
+            textoTipo = 'Americano';
+            break;
+        case '2':
+            textoTipo = 'Asiatico';
+            break;
+        case '3':
+            textoTipo = 'Europeo';
+            break;
+        default:
+            break;
+    }
+
+    const div = document.createElement('div');
+    div.classList.add('mt-10');
+    div.innerHTML = `
+        <p class='header'>Tu resumen</p>
+        <p class='font-bold'>Marca: <span class='font-normal'>${textoTipo}</span></p>
+        <p class='font-bold'>Year: <span class='font-normal'>${year}</span></p>
+        <p class='font-bold'>Tipo: <span class='font-normal capitalize'>${tipo}</span></p>
+        <p class='font-bold'>Total: <span class='font-normal'>$${total}</span></p>
+    `
+    const resultadoDiv = document.querySelector('#resultado');
+
+    // mostrar el spinner
+    const spinner = document.querySelector('#cargando');
+    spinner.style.display = 'block';
+
+    setTimeout(() => {
+        spinner.style.display = 'none';
+        resultadoDiv.appendChild(div);
+    }, 3000);
+}
+
 
 // instanciar ui
 const ui = new UI();
@@ -110,10 +148,16 @@ function cotizarSeguro(e){
     }
     ui.mostrarMensaje('Cotizando', 'exito');
 
+    // remover div de resultados anteriores
+    const resultados = document.querySelector('#resultado div');
+    if(resultados != null){
+        resultados.remove();
+    }
+
     // instanciar seguro
     const seguro = new Seguro(marca, year, tipo);
-    seguro.cotizarSeguro();
+    const total = seguro.cotizarSeguro();
 
     // utilizar el proto que va a cotizar
-
+    ui.mostrarResultado(total, seguro);
 }
